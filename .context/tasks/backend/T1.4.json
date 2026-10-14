@@ -15,7 +15,7 @@
   "parallel_group": "backend-agent",
   "acceptance_test": "uv run --project backend pytest -q backend/tests",
   "sdd_snippet": "`main.py` alone maps those outcomes to the browser HTTP responses. No worker adds a fourth endpoint.",
-  "status": "pending",
+  "status": "complete",
   "dependents": [],
   "parent_task": null
 }

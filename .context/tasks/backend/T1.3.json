@@ -14,7 +14,7 @@
   "parallel_group": "backend-agent",
   "acceptance_test": "uv run --project backend pytest -q backend/tests/test_upstream.py",
   "sdd_snippet": "It signals missing projects, unavailable reads, and uncertain writes distinctly.",
-  "status": "pending",
+  "status": "complete",
   "dependents": [
     "T1.4"
   ],

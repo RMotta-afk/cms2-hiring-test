@@ -11,7 +11,7 @@
   "parallel_group": "backend-agent",
   "acceptance_test": "uv run --project backend ty check backend/project_editor/contracts.py",
   "sdd_snippet": "`contracts.py` owns `EditableFields`, `ProjectDetail`, `ProjectSummary`, `StoredProject`",
-  "status": "pending",
+  "status": "complete",
   "dependents": [
     "T1.2",
     "T1.3"
