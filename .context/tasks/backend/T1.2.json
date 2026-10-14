@@ -14,7 +14,7 @@
   "parallel_group": "backend-agent",
   "acceptance_test": "uv run --project backend pytest -q backend/tests/test_merge.py",
   "sdd_snippet": "`merge.py` exports `merge_edit(base: EditableFields, proposed: EditableFields, current: EditableFields) -> MergeResult`.",
-  "status": "pending",
+  "status": "complete",
   "dependents": [
     "T1.4"
   ],
