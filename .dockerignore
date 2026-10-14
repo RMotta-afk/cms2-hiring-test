@@ -1,0 +1,16 @@
+.git
+.context
+.venv
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/node_modules
+**/dist
+docs
+README.md
+AGENTS.md
+AI_TRAIL.md
+DECISIONS.md
+*.log
+.env

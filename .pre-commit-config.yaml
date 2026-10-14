@@ -21,10 +21,10 @@ repos:
     hooks:
       - id: backend-ty
         name: backend type check
-        entry: uv run --project backend ty check backend/project_editor backend/tests
+        entry: uv run --project backend ty check backend/project_editor backend/tests docker/smoke_test.py
         language: system
         pass_filenames: false
-        files: ^backend/(project_editor|tests)/.*\.py$|^backend/pyproject\.toml$
+        files: ^backend/(project_editor|tests)/.*\.py$|^backend/pyproject\.toml$|^docker/smoke_test\.py$
       - id: backend-tests
         name: backend tests
         entry: uv run --project backend pytest -q backend/tests

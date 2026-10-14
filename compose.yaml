@@ -1,0 +1,67 @@
+name: cms2-project-editor
+
+services:
+  upstream:
+    build:
+      context: .
+      dockerfile: docker/upstream.Dockerfile
+    environment:
+      UPSTREAM_SLOW_RATE: ${UPSTREAM_SLOW_RATE:-0}
+      UPSTREAM_TIMEOUT_RATE: ${UPSTREAM_TIMEOUT_RATE:-0}
+    expose:
+      - "8081"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8081/projects', headers={'X-Api-Key': 'local-dev-key'}), timeout=2)"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    init: true
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      UPSTREAM_URL: http://upstream:8081
+      UPSTREAM_API_KEY: local-dev-key
+    expose:
+      - "8080"
+    depends_on:
+      upstream:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/openapi.json', timeout=2)"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    init: true
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "${APP_PORT:-8082}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    init: true
