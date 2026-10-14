@@ -1,0 +1,20 @@
+{
+  "task_id": "T2.3",
+  "goal_id": "G2",
+  "title": "Verify editor screen and local proxy",
+  "rationale": "The frontend agent owns list, show, edit, conflict resolution, uncertainty UI, and local routing in one lane.",
+  "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+  "files": [
+    "frontend/src/App.tsx",
+    "frontend/vite.config.ts"
+  ],
+  "blocked_by": [
+    "T2.2"
+  ],
+  "parallel_group": "frontend-agent",
+  "acceptance_test": "npm --prefix frontend run build",
+  "sdd_snippet": "`App.tsx` owns selection, the list and edit form, base/draft snapshots, key-date rows, per-field conflict choices",
+  "status": "pending",
+  "dependents": [],
+  "parent_task": null
+}

@@ -1,0 +1,22 @@
+{
+  "task_id": "T1.2",
+  "goal_id": "G1",
+  "title": "Verify three-way merge and conflict cases",
+  "rationale": "The pure merge boundary must preserve different-field edits and flag overlapping edits before routes use it.",
+  "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+  "files": [
+    "backend/project_editor/merge.py",
+    "backend/tests/test_merge.py"
+  ],
+  "blocked_by": [
+    "T1.1"
+  ],
+  "parallel_group": "backend-agent",
+  "acceptance_test": "uv run --project backend pytest -q backend/tests/test_merge.py",
+  "sdd_snippet": "`merge.py` exports `merge_edit(base: EditableFields, proposed: EditableFields, current: EditableFields) -> MergeResult`.",
+  "status": "pending",
+  "dependents": [
+    "T1.4"
+  ],
+  "parent_task": null
+}

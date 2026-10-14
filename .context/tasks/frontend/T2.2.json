@@ -1,0 +1,21 @@
+{
+  "task_id": "T2.2",
+  "goal_id": "G2",
+  "title": "Verify relative browser API client",
+  "rationale": "All browser requests and error parsing must use the same /api boundary.",
+  "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+  "files": [
+    "frontend/src/api.ts"
+  ],
+  "blocked_by": [
+    "T2.1"
+  ],
+  "parallel_group": "frontend-agent",
+  "acceptance_test": "npm --prefix frontend run build",
+  "sdd_snippet": "`api.ts` exports `listProjects()`, `getProject(id)`, and `saveProject(id, base, proposed)`",
+  "status": "pending",
+  "dependents": [
+    "T2.3"
+  ],
+  "parent_task": null
+}

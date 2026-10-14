@@ -1,0 +1,20 @@
+{
+  "task_id": "T1.1",
+  "goal_id": "G1",
+  "title": "Reconcile backend project contracts",
+  "rationale": "Validated browser inputs and narrow response projections must match the frozen API before backend behavior is adjusted.",
+  "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+  "files": [
+    "backend/project_editor/contracts.py"
+  ],
+  "blocked_by": [],
+  "parallel_group": "backend-agent",
+  "acceptance_test": "uv run --project backend ty check backend/project_editor/contracts.py",
+  "sdd_snippet": "`contracts.py` owns `EditableFields`, `ProjectDetail`, `ProjectSummary`, `StoredProject`",
+  "status": "pending",
+  "dependents": [
+    "T1.2",
+    "T1.3"
+  ],
+  "parent_task": null
+}

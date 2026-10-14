@@ -19,11 +19,11 @@ Build a small editor in front of the fixed records API. The usable path is list 
 | Backend checks | Focused behavior and adapter tests | `backend/tests/` |
 | Frontend schemas | Zod versions of the browser contract | `frontend/src/contracts.ts` |
 | Frontend client | Relative `/api` requests and response parsing | `frontend/src/api.ts` |
-| Frontend parts | List, edit form, and conflict choice as separate files so work can proceed in parallel | `frontend/src/ProjectList.tsx`, `frontend/src/ProjectForm.tsx`, `frontend/src/ConflictResolution.tsx` |
-| Frontend assembly | Screen state, save/rebase flow, and local proxy; replaces the baseline placeholder entry point | `frontend/src/App.tsx`, `frontend/src/main.tsx`, `frontend/vite.config.ts` |
+| Frontend screen | List, edit form, per-field conflict choice, save/rebase state, and uncertainty handling | `frontend/src/App.tsx` |
+| Frontend delivery | Entry point and local backend proxy | `frontend/src/main.tsx`, `frontend/vite.config.ts` |
 | Handoff | Human setup instructions, tradeoffs, and AI trail | `README.md`, `DECISIONS.md`, `AI_TRAIL.md` |
 
-The frontend components may be combined during the one-hour build only if one owner takes the combined file; two worktrees must never edit the same file independently. The shared API contract remains authoritative if code and prose disagree during parallel work.
+One frontend agent owns the complete frontend lane, including the combined `App.tsx` screen. One backend agent owns the backend lane. Neither agent edits shared contracts, root documents, or the other lane's files. The shared API contract remains authoritative if code and prose disagree during parallel work.
 
 ## Backend module interfaces
 
@@ -35,9 +35,9 @@ The frontend components may be combined during the one-hour build only if one ow
 
 ## Frontend component interfaces
 
-`contracts.ts` exports Zod schemas and inferred `ProjectSummary`, `ProjectDetail`, `EditableFields`, and `EditableFieldName` types. `api.ts` exports `listProjects()`, `getProject(id)`, and `saveProject(id, base, proposed)`; save returns a discriminated result for `saved`, `conflict`, or `uncertain`. It alone calls `fetch`, always with relative `/api` paths.
+`contracts.ts` exports Zod schemas and inferred `ProjectSummary`, `ProjectDetail`, `EditableFields`, and `EditableField` types. `api.ts` exports `listProjects()`, `getProject(id)`, and `saveProject(id, base, proposed)`; save returns a discriminated result for `saved`, `conflict`, or `uncertain`. It alone calls `fetch`, always with relative `/api` paths.
 
-`ProjectList.tsx` receives summaries, selected ID, loading state, and an `onSelect(id)` callback. `ProjectForm.tsx` receives a draft, saving/disabled state, and `onChange(nextDraft)` and `onSave()` callbacks; it owns field and date-row controls but no network or project selection. `ConflictResolution.tsx` receives the current record, draft, conflicting field names, current choices, and `onChoose(field, current|mine)` / `onApply()` callbacks. `App.tsx` owns selection, base/draft snapshots, conflict rebase, uncertainty, and API orchestration. Components do not mutate props or call the upstream.
+`App.tsx` owns selection, the list and edit form, base/draft snapshots, key-date rows, per-field conflict choices, conflict rebase, uncertainty, and API orchestration. It calls the frontend API client, never the upstream. The frontend agent may later extract view components within its own lane without changing the browser contract.
 
 ## Allowed dependencies
 

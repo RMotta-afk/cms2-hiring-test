@@ -1,0 +1,21 @@
+{
+  "task_id": "T1.4",
+  "goal_id": "G1",
+  "title": "Verify list, show, and save routes",
+  "rationale": "Routes combine validation, merge results, upstream I/O, and the agreed 200/409/504 responses.",
+  "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+  "files": [
+    "backend/project_editor/main.py",
+    "backend/tests/test_api.py"
+  ],
+  "blocked_by": [
+    "T1.2",
+    "T1.3"
+  ],
+  "parallel_group": "backend-agent",
+  "acceptance_test": "uv run --project backend pytest -q backend/tests",
+  "sdd_snippet": "`main.py` alone maps those outcomes to the browser HTTP responses. No worker adds a fourth endpoint.",
+  "status": "pending",
+  "dependents": [],
+  "parent_task": null
+}

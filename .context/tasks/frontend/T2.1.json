@@ -1,0 +1,19 @@
+{
+  "task_id": "T2.1",
+  "goal_id": "G2",
+  "title": "Reconcile frontend Zod contract",
+  "rationale": "The frontend needs typed request and response validation while preserving the exact base snapshot for merge comparisons.",
+  "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+  "files": [
+    "frontend/src/contracts.ts"
+  ],
+  "blocked_by": [],
+  "parallel_group": "frontend-agent",
+  "acceptance_test": "npm --prefix frontend run build",
+  "sdd_snippet": "`contracts.ts` exports Zod schemas and inferred `ProjectSummary`, `ProjectDetail`, `EditableFields`, and `EditableField` types.",
+  "status": "pending",
+  "dependents": [
+    "T2.2"
+  ],
+  "parent_task": null
+}

@@ -1,0 +1,22 @@
+{
+  "task_id": "T1.3",
+  "goal_id": "G1",
+  "title": "Verify upstream replacement and uncertain writes",
+  "rationale": "The adapter must preserve latest linked companies and distinguish missing reads, unavailable reads, and ambiguous PUT results.",
+  "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+  "files": [
+    "backend/project_editor/upstream.py",
+    "backend/tests/test_upstream.py"
+  ],
+  "blocked_by": [
+    "T1.1"
+  ],
+  "parallel_group": "backend-agent",
+  "acceptance_test": "uv run --project backend pytest -q backend/tests/test_upstream.py",
+  "sdd_snippet": "It signals missing projects, unavailable reads, and uncertain writes distinctly.",
+  "status": "pending",
+  "dependents": [
+    "T1.4"
+  ],
+  "parent_task": null
+}

@@ -1,8 +1,8 @@
 # Project editor implementation plan
 
-Status: the shared-workspace MVP has been implemented against this contract. The task DAG remains a proposed file-disjoint worktree sequence, not a claim that the current code is absent. Its pending task statuses track that future branch workflow. Review existing code before assigning a task so work is not repeated.
+Status: the MVP is implemented. The task DAG now has two independent agent queues for reconciling and extending that baseline. Pending statuses track work in those queues, not missing runtime behavior.
 
-This document is the human entry point. The normative architecture, allowed dependencies, API payloads, and worktree ownership live in [the SDD](sdd/architecture.md), [API contract](sdd/api-contract.md), and [worktree rules](sdd/worktrees.md). The machine-readable task DAG is in [`.context/decomposition.json`](../.context/decomposition.json), with one task file under `.context/tasks/` for each atomic task.
+This document is the human entry point. The normative architecture, allowed dependencies, API payloads, and worktree ownership live in [the SDD](sdd/architecture.md), [API contract](sdd/api-contract.md), and [worktree rules](sdd/worktrees.md). The machine-readable task DAG is in [`.context/decomposition.json`](../.context/decomposition.json). Backend task files are under [`.context/tasks/backend/`](../.context/tasks/backend/) and frontend task files under [`.context/tasks/frontend/`](../.context/tasks/frontend/).
 
 ## Goal and boundary
 
@@ -51,20 +51,15 @@ For a conflict-free save, send all upstream-required fields: merged core values 
 
 This is best-effort for sequential stale editors. A write between the fresh read and full `PUT`, from another backend instance or the importer, can still be lost. No local or backend-only lock solves that. A production guarantee requires upstream conditional writes or a single transactional write path respected by every writer.
 
-## Dependencies and parallel execution
+## Two independent agent queues
 
-The build uses Python 3.11+, FastAPI/Pydantic, HTTPX, Uvicorn, uv, pytest, Ruff, and ty on the backend; React, MUI, Zod, TypeScript, Vite, Node, and npm on the frontend; and pre-commit for the local gate. The manifests and lockfiles belong to the shared baseline, not to feature branches. The SDD fixes the exact responsibilities and file paths.
+The shared baseline already includes the dependency manifests, lockfiles, commit gate, and frozen API contract. One agent owns the backend queue; one owns the frontend queue. They begin from the same commit in separate worktrees. The backend agent touches only `backend/project_editor/` and `backend/tests/`. The frontend agent touches only `frontend/src/` and `frontend/vite.config.ts`. Neither agent owns shared documents, manifests, the other lane, or `upstream/`.
 
-| Wave | Gate | Work that can proceed together |
+| Agent | Ordered tasks | Lane acceptance |
 | --- | --- | --- |
-| 1. Shared baseline | Freeze and commit the SDD contract, manifests, lockfiles, buildable frontend placeholder, and hook config | Backend and frontend manifests are file-disjoint; frontend scaffold follows its manifest |
-| 2. Typed contracts | Baseline is common to all worktrees | Pydantic backend models and Zod frontend schemas |
-| 3. Independent modules | Relevant model/schema task has merged | Backend merge logic; upstream adapter; frontend API client; list view; form/conflict view |
-| 4. Assembly | Each lane's modules have merged | Backend routes/tests and frontend screen/proxy, in separate worktrees |
-| 5. Integration | Both assembled lanes have merged | Live smoke/decision record and run instructions; AI trail after checks |
+| Backend | `T1.1` models; `T1.2` merge; `T1.3` adapter; `T1.4` routes | Ruff, ty, and backend tests pass |
+| Frontend | `T2.1` Zod contract; `T2.2` relative API client; `T2.3` screen and proxy | TypeScript and Vite build pass |
 
-The DAG encodes the exact `blocked_by` edges. A task may start as soon as its prerequisites have merged; workers need not wait for unrelated tasks in the same wave. Each task touches at most three files and has one acceptance check. The current Codex team can run three worker agents alongside the integration owner; the file-disjoint graph also works with more independent worktrees if available.
+The `blocked_by` edges stay within each queue. Backend and frontend work can start and finish independently; neither waits for a task in the other lane. Each task touches at most three files and has one acceptance command. Because the MVP already exists, agents compare each task with current code and make only needed changes. They report the commit and checks for their lane.
 
-The integration owner controls `docs/sdd/`, `.context/`, root Markdown deliverables, and `.pre-commit-config.yaml`. Backend workers control only their assigned `backend/` files; frontend workers control only their assigned `frontend/` files. Component files are separate so list, form/conflict, and API-client work can be merged without competing edits to `App.tsx`. Only the frontend assembly task owns `App.tsx`. Only the backend route task owns `main.py`. A contract change goes through the integration owner and both lanes rebase before continuing.
-
-Within the strict one-hour build, spend the time on a working list/show/save path, merge/conflict behavior, and honest verification. Search, pagination, authentication, a database, linked-company editing, and visual polish stay out of scope. The exact safety limit across three backend instances and the direct importer is documented above and in the SDD.
+The integration owner merges both branches, checks the shared contract, runs the full pre-commit gate, and exercises the live list/show/save/conflict path and Vite proxy. That final check is outside both agent queues. Contract or dependency changes go through the integration owner before either lane adopts them. Search, pagination, authentication, a database, linked-company editing, and visual polish remain outside this MVP.
