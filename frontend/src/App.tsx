@@ -4,7 +4,7 @@ import {
   ListItemButton, ListItemText, MenuItem, Paper, Stack, TextField,
   Typography,
 } from '@mui/material'
-import { getProject, listProjects, saveProject } from './api'
+import { ApiError, getProject, listProjects, saveProject } from './api'
 import {
   EditableFieldsSchema, SectorSchema, StageSchema, editableFieldNames, editableFields,
   type ConflictResponse, type EditableField, type EditableFields,
@@ -174,7 +174,9 @@ export default function App() {
       }
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Could not process the save response.')
-      setUncertainty({ code: 'write_uncertain', observed: null })
+      if (!(reason instanceof ApiError) || reason.status === 504) {
+        setUncertainty({ code: 'write_uncertain', observed: null })
+      }
     } finally {
       setSaving(false)
     }

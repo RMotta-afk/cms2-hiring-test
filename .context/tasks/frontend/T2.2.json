@@ -13,7 +13,7 @@
   "parallel_group": "frontend-agent",
   "acceptance_test": "npm --prefix frontend run build",
   "sdd_snippet": "`api.ts` exports `listProjects()`, `getProject(id)`, and `saveProject(id, base, proposed)`",
-  "status": "pending",
+  "status": "completed",
   "dependents": [
     "T2.3"
   ],

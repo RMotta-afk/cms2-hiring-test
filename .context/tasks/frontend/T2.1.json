@@ -11,7 +11,7 @@
   "parallel_group": "frontend-agent",
   "acceptance_test": "npm --prefix frontend run build",
   "sdd_snippet": "`contracts.ts` exports Zod schemas and inferred `ProjectSummary`, `ProjectDetail`, `EditableFields`, and `EditableField` types.",
-  "status": "pending",
+  "status": "completed",
   "dependents": [
     "T2.2"
   ],

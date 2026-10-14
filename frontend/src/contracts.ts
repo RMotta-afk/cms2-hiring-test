@@ -6,11 +6,11 @@ export const SectorSchema = z.enum([
 export const StageSchema = z.enum([
   'idea', 'feasibility', 'tender', 'financing', 'construction', 'operation', 'cancelled',
 ])
-export const KeyDateSchema = z.object({
+export const KeyDateSchema = z.strictObject({
   label: z.string().min(1, 'A date label is required').refine((value) => value.trim().length > 0, 'A date label is required'),
   date: z.iso.date(),
 })
-export const EditableFieldsSchema = z.object({
+export const EditableFieldsSchema = z.strictObject({
   name: z.string().min(1, 'Name is required').refine((value) => value.trim().length > 0, 'Name is required'),
   sector: SectorSchema,
   country: z.string().min(1, 'Country is required').refine((value) => value.trim().length > 0, 'Country is required'),
@@ -19,14 +19,20 @@ export const EditableFieldsSchema = z.object({
 })
 export const ProjectSchema = EditableFieldsSchema.extend({ id: z.string() })
 export const ProjectSummarySchema = ProjectSchema.omit({ key_dates: true })
-export const ProjectListResponseSchema = z.object({ projects: z.array(ProjectSummarySchema) })
-export const ProjectResponseSchema = z.object({ project: ProjectSchema })
-export const ConflictResponseSchema = z.object({
+export const ProjectListResponseSchema = z.strictObject({ projects: z.array(ProjectSummarySchema) })
+export const ProjectResponseSchema = z.strictObject({ project: ProjectSchema })
+export const ProjectNotFoundResponseSchema = z.strictObject({
+  code: z.literal('project_not_found'),
+})
+export const UpstreamUnavailableResponseSchema = z.strictObject({
+  code: z.literal('upstream_unavailable'),
+})
+export const ConflictResponseSchema = z.strictObject({
   code: z.literal('edit_conflict'),
   current: ProjectSchema,
   conflicting_fields: z.array(EditableFieldsSchema.keyof()),
 })
-export const UncertainResponseSchema = z.object({
+export const UncertainResponseSchema = z.strictObject({
   code: z.literal('write_uncertain'),
   observed: ProjectSchema.nullable(),
 })

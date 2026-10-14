@@ -14,7 +14,7 @@
   "parallel_group": "frontend-agent",
   "acceptance_test": "npm --prefix frontend run build",
   "sdd_snippet": "`App.tsx` owns selection, the list and edit form, base/draft snapshots, key-date rows, per-field conflict choices",
-  "status": "pending",
+  "status": "completed",
   "dependents": [],
   "parent_task": null
 }
