@@ -1,0 +1,24 @@
+{
+  "task_id": "T2.2",
+  "goal_id": "G2",
+  "title": "Implement frontend Zod contracts",
+  "status": "pending",
+  "blocked_by": [
+    "T1.4",
+    "T1.5"
+  ],
+  "dependents": [
+    "T3.3",
+    "T3.4",
+    "T3.5"
+  ],
+  "parent_task": null,
+  "files": [
+    "frontend/src/contracts.ts"
+  ],
+  "parallel_group": "schemas",
+  "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+  "rationale": "The browser must parse and type the exact request and response shapes.",
+  "acceptance_test": "cd frontend && npm run build",
+  "sdd_snippet": "| Frontend schemas | Zod versions of the browser contract |"
+}

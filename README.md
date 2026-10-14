@@ -1,66 +1,54 @@
-# Project editor challenge
+# Project editor
 
-We build internal tools for a research team that keeps thousands of infrastructure project records
-accurate. Those records live in an **upstream records API** that another team owns. You cannot change
-it. Your job is the layer in front of it.
+A small React and FastAPI editor for the fictional upstream records API. It lists projects, shows one project, and saves edits to its core fields and key dates. The browser uses only this backend's `/api` routes; the upstream API key stays on the backend.
 
-## Start here
+## Run locally
 
-1. Click **Use this template** on this repository to create your own copy in your GitHub account.
-   Public or private is your choice; if private, invite `juandiegoantezana-zaga`.
-2. Run the upstream API locally. Instructions, and its known habits, are in
-   [`upstream/README.md`](upstream/README.md). It comes seeded with about 30 fictional projects.
+Requires Python 3.11+, [uv](https://docs.astral.sh/uv/), Node, and npm. Start each command in a separate terminal from the repository root:
 
-## What to build (about an hour, likely less with good tooling)
+```sh
+cd upstream
+uv run upstream
+```
 
-Use AI the way you would on a real task here, not the way you would for a quick question. We are as
-interested in how you prepared your tooling for the job as in what you asked it to do.
+```sh
+cd backend
+uv run project-editor
+```
 
-| Piece | What it needs to do |
-|---|---|
-| **A backend (Python, FastAPI)** | Sits between the browser and the upstream API. Lists projects, returns one project, saves edits to one project |
-| **A frontend (React + MUI)** | A project list, and an edit form for the project's core fields and its key dates |
-| **Safe concurrent editing** | Two people can edit the same project at the same time. If they change different fields, both changes must survive. If they change the same field, neither may silently win: the person saving second decides. The upstream gives you no help with this. Decide what "the same field" means for the key dates, and say why |
+```sh
+cd frontend
+npm ci
+npm run dev
+```
 
-One hard rule: **the browser never calls the upstream API directly.** Everything goes through your
-backend.
+Open `http://127.0.0.1:5173`. The backend is at `http://127.0.0.1:8080`; Vite proxies `/api` to it. The backend defaults to `http://127.0.0.1:8081` and the starter's local API key. Set `UPSTREAM_URL` and `UPSTREAM_API_KEY` in the backend process when using another upstream. Do not put the key in frontend environment variables.
 
-**Where this will run.** In production your backend runs as three instances behind a load balancer,
-and a nightly import job writes to the upstream directly, without going through your backend. You do
-not need to build either. Your design does need to survive both.
+The upstream intentionally has a roughly 10% chance of a slow individual read or an ambiguous `504` on save. To make local checks deterministic, set `UPSTREAM_SLOW_RATE=0` and `UPSTREAM_TIMEOUT_RATE=0` **in the upstream process** before starting it. Its records live in memory and reset on restart.
 
-**You will extend this code live in the interview.** Leave it in the state you would want to work in.
+## API contract
 
-The upstream has some awkward habits. They are in its README. Dealing with them is part of the task.
-Do not modify anything in `upstream/`.
+| Route | Success | Other relevant responses |
+| --- | --- | --- |
+| `GET /api/projects` | `{ "projects": [{ "id", "name", "sector", "country", "stage" }] }` | `502` upstream unavailable |
+| `GET /api/projects/{id}` | `{ "project": { "id", "name", "sector", "country", "stage", "key_dates" } }` | `404`, `502` |
+| `PUT /api/projects/{id}` | `{ "project": ... }` | `409` edit conflict, `504` uncertain write, `422` invalid request |
 
-## What we are not asking for
+The `PUT` body is `{ "base": EditableFields, "proposed": EditableFields }`. `EditableFields` contains `name`, `sector`, `country`, `stage`, and `key_dates: [{ "label", "date" }]`; dates are `YYYY-MM-DD`. Both snapshots are required so the backend can identify what the editor actually changed. `409` returns `{ "code": "edit_conflict", "current": ProjectDetail, "conflicting_fields": [...] }`. `504` returns `{ "code": "write_uncertain", "observed": ProjectDetail | null }`. The frontend parses these contracts with Zod; the backend validates them with Pydantic.
 
-This is deliberately more than fits in the time. What you cut, and why, is part of what we read. We do
-not score UI polish, test coverage percentage, formatting, or how much you produced. Something small
-that works and is honestly described beats something large that is oversold.
+On conflict, choose current or mine for each overlapping field and resubmit against the returned current record. The entire key-date list is one field. The UI supports adding, editing, and removing date rows. `linked_companies` is not exposed for editing, but the backend includes its latest read value in the upstream's required full `PUT`.
 
-## What to send back
+## Check the project
 
-| Deliverable | Notes |
-|---|---|
-| **The link to your repo** | With everything committed. Replace this README with your own: what runs, what does not, and how to start it |
-| **`DECISIONS.md`** (one page) | What you chose, what you cut and why, and what would break first if this had 50 editors |
-| **Your AI trail** | Whatever your tooling left behind, committed or attached: how you set it up, what you told it, what it produced. Plus a short note: how you approached the task before any code was written, where the tool carried the work, where you overrode it, and what you checked by hand |
+```sh
+pre-commit install
+pre-commit run --all-files
+cd backend && uv run pytest -q && uv run ty check project_editor tests
+cd ../frontend && npm run build
+```
 
-Please return it within a week of receiving this brief.
+The installed commit hook runs file checks, Ruff lint and format, backend ty and tests, and the frontend build for relevant staged files. It does not touch `upstream/`. Ruff is pinned to `0.16.10` in the hook and backend project; `uvx ruff@0.16.10` invokes the same version directly.
 
-## The interview
+## Limits
 
-We use the same codebase, running on your machine, with you sharing your screen. The first part is a
-walkthrough of your decisions and of how you work with AI. In the second part we extend the code
-together, live.
-
-**Come with the environment you actually work in**, configured the way you like it, including anything
-you have added to your AI tooling over time. Requirements will change during the session, and we want
-you to respond the way you would at work, with whatever you would normally reach for. Nothing is off
-limits. We want to see how you really work.
-
----
-
-All projects, companies and places in this repository are fictional.
+This is a focused editor, not a production concurrency guarantee. The upstream has no revision or conditional write, and an importer writes to it directly. Two writers can change it between this backend's fresh read and full `PUT`. A timed-out write may have happened; the editor re-reads when possible, reports what it observed, and does not retry automatically. See [DECISIONS.md](DECISIONS.md) for the exact tradeoffs and [AI_TRAIL.md](AI_TRAIL.md) for the development approach.

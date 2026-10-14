@@ -1,0 +1,22 @@
+{
+  "task_id": "T1.1",
+  "goal_id": "G1",
+  "title": "Freeze SDD and API contract",
+  "status": "pending",
+  "blocked_by": [],
+  "dependents": [
+    "T1.2",
+    "T1.3"
+  ],
+  "parent_task": null,
+  "files": [
+    "docs/sdd/architecture.md",
+    "docs/sdd/api-contract.md",
+    "docs/sdd/worktrees.md"
+  ],
+  "parallel_group": null,
+  "sdd_reference": "docs/sdd/api-contract.md#endpoints",
+  "rationale": "A single reviewed source prevents backend/frontend contract drift.",
+  "acceptance_test": "Compare the route, field, and failure tables against upstream/README.md and upstream/records_api/main.py.",
+  "sdd_snippet": "This is the frozen contract for separate backend and frontend worktrees."
+}

@@ -1,0 +1,39 @@
+exclude: ^upstream/
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: backend-ty
+        name: backend type check
+        entry: uv run --project backend ty check backend/project_editor backend/tests
+        language: system
+        pass_filenames: false
+        files: ^backend/(project_editor|tests)/.*\.py$|^backend/pyproject\.toml$
+      - id: backend-tests
+        name: backend tests
+        entry: uv run --project backend pytest -q backend/tests
+        language: system
+        pass_filenames: false
+        files: ^backend/(project_editor|tests)/.*\.py$|^backend/pyproject\.toml$
+      - id: frontend-build
+        name: frontend build
+        entry: npm --prefix frontend run build
+        language: system
+        pass_filenames: false
+        files: ^frontend/

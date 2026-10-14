@@ -1,0 +1,22 @@
+{
+  "task_id": "T3.5",
+  "goal_id": "G3",
+  "title": "Implement form and conflict views",
+  "status": "pending",
+  "blocked_by": [
+    "T2.2"
+  ],
+  "dependents": [
+    "T4.2"
+  ],
+  "parent_task": null,
+  "files": [
+    "frontend/src/ProjectForm.tsx",
+    "frontend/src/ConflictResolution.tsx"
+  ],
+  "parallel_group": "isolated-modules",
+  "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+  "rationale": "Date editing and per-field conflict choices are file-disjoint from the list and API client.",
+  "acceptance_test": "cd frontend && npm run build",
+  "sdd_snippet": "`ProjectForm.tsx` receives a draft, saving/disabled state, and `onChange(nextDraft)` and `onSave()` callbacks; it owns field and date-row controls but no network or project selection."
+}

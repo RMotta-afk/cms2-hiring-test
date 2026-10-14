@@ -1,0 +1,358 @@
+{
+  "mission": {
+    "statement": "A small, typed project editor lists and shows upstream projects, saves validated edits through its backend, resolves sequential stale-editor conflicts explicitly, and documents unavoidable upstream concurrency limits.",
+    "terminal_signal": "All three API routes and the React editor work against the real upstream; focused backend checks, ty, Ruff, frontend build, pre-commit, and live conflict smoke pass; README, DECISIONS.md, and AI_TRAIL.md are accurate."
+  },
+  "goals": [
+    {
+      "goal_id": "G1",
+      "title": "Freeze the shared baseline",
+      "rationale": "Every worktree needs one contract and reproducible dependencies before parallel code.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+      "completion_signal": "SDD, backend/frontend lockfiles, buildable frontend scaffold, and hook configuration are reviewed and committed on one baseline; pre-commit validates and frontend builds."
+    },
+    {
+      "goal_id": "G2",
+      "title": "Define typed browser contracts",
+      "rationale": "Both lanes can implement independently only after the payload shapes and validation rules are represented in their languages.",
+      "sdd_reference": "docs/sdd/api-contract.md#types",
+      "completion_signal": "Backend models pass ty and frontend Zod schemas pass the TypeScript build."
+    },
+    {
+      "goal_id": "G3",
+      "title": "Build independent modules",
+      "rationale": "File-disjoint merge, upstream, client, and view work produces the largest safe parallel wave.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+      "completion_signal": "Focused backend tests and frontend build pass after module branches merge."
+    },
+    {
+      "goal_id": "G4",
+      "title": "Assemble the two applications",
+      "rationale": "Routes and screen state can be wired independently once their modules exist.",
+      "sdd_reference": "docs/sdd/worktrees.md#baseline-and-branches",
+      "completion_signal": "Backend API tests and frontend build pass in their separate worktrees."
+    },
+    {
+      "goal_id": "G5",
+      "title": "Integrate, verify, and hand off",
+      "rationale": "A real upstream flow and honest documentation prove the vertical slice and its limits.",
+      "sdd_reference": "docs/sdd/architecture.md#runtime-behavior-and-safety",
+      "completion_signal": "Live list/show/save/conflict and proxy checks pass; full pre-commit gate passes; handoff docs match observations."
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "T1.1",
+      "goal_id": "G1",
+      "title": "Freeze SDD and API contract",
+      "rationale": "A single reviewed source prevents backend/frontend contract drift.",
+      "sdd_reference": "docs/sdd/api-contract.md#endpoints",
+      "files": [
+        "docs/sdd/architecture.md",
+        "docs/sdd/api-contract.md",
+        "docs/sdd/worktrees.md"
+      ],
+      "blocked_by": [],
+      "parallel_group": null,
+      "acceptance_test": "Compare the route, field, and failure tables against upstream/README.md and upstream/records_api/main.py.",
+      "sdd_snippet": "This is the frozen contract for separate backend and frontend worktrees."
+    },
+    {
+      "task_id": "T1.2",
+      "goal_id": "G1",
+      "title": "Lock backend dependencies",
+      "rationale": "Backend workers must share the same typed FastAPI toolchain.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+      "files": [
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "backend/project_editor/__init__.py"
+      ],
+      "blocked_by": [
+        "T1.1"
+      ],
+      "parallel_group": "manifests",
+      "acceptance_test": "cd backend && uv sync --locked",
+      "sdd_snippet": "| Backend | Python 3.11+, FastAPI/Pydantic, HTTPX, Uvicorn | uv, pytest, Ruff, ty |"
+    },
+    {
+      "task_id": "T1.3",
+      "goal_id": "G1",
+      "title": "Lock frontend dependencies",
+      "rationale": "Frontend workers need a reproducible React, MUI, and Zod toolchain.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+      "files": [
+        "frontend/package.json",
+        "frontend/package-lock.json"
+      ],
+      "blocked_by": [
+        "T1.1"
+      ],
+      "parallel_group": "manifests",
+      "acceptance_test": "cd frontend && npm ci",
+      "sdd_snippet": "| Frontend | React, MUI, Zod | TypeScript, Vite, npm |"
+    },
+    {
+      "task_id": "T1.4",
+      "goal_id": "G1",
+      "title": "Validate the commit gate",
+      "rationale": "The common baseline should reject malformed or untyped work before feature branches diverge.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+      "files": [
+        ".pre-commit-config.yaml"
+      ],
+      "blocked_by": [
+        "T1.2",
+        "T1.3"
+      ],
+      "parallel_group": null,
+      "acceptance_test": "pre-commit validate-config .pre-commit-config.yaml",
+      "sdd_snippet": "| Commit gate | pre-commit, Ruff hook, local ty/test/build hooks | pre-commit |"
+    },
+    {
+      "task_id": "T1.5",
+      "goal_id": "G1",
+      "title": "Create buildable frontend placeholder",
+      "rationale": "A buildable frontend baseline lets independent component branches type-check before App assembly.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+      "files": [
+        "frontend/index.html",
+        "frontend/tsconfig.json",
+        "frontend/src/main.tsx"
+      ],
+      "blocked_by": [
+        "T1.3"
+      ],
+      "parallel_group": "baseline-scaffold",
+      "acceptance_test": "cd frontend && npm run build",
+      "sdd_snippet": "| Shared scaffold | Reproducible manifests and a buildable placeholder frontend before parallel work |"
+    },
+    {
+      "task_id": "T2.1",
+      "goal_id": "G2",
+      "title": "Implement backend Pydantic contracts",
+      "rationale": "Server validation and projections must match the frozen browser API.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+      "files": [
+        "backend/project_editor/contracts.py",
+        "backend/tests/test_contracts.py"
+      ],
+      "blocked_by": [
+        "T1.4",
+        "T1.5"
+      ],
+      "parallel_group": "schemas",
+      "acceptance_test": "cd backend && uv run ty check project_editor/contracts.py tests/test_contracts.py",
+      "sdd_snippet": "| Backend models | Validate browser input and parse the wide upstream record; expose only small response models |"
+    },
+    {
+      "task_id": "T2.2",
+      "goal_id": "G2",
+      "title": "Implement frontend Zod contracts",
+      "rationale": "The browser must parse and type the exact request and response shapes.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+      "files": [
+        "frontend/src/contracts.ts"
+      ],
+      "blocked_by": [
+        "T1.4",
+        "T1.5"
+      ],
+      "parallel_group": "schemas",
+      "acceptance_test": "cd frontend && npm run build",
+      "sdd_snippet": "| Frontend schemas | Zod versions of the browser contract |"
+    },
+    {
+      "task_id": "T3.1",
+      "goal_id": "G3",
+      "title": "Implement pure three-way merge",
+      "rationale": "Concurrent edit decisions need a small testable domain boundary.",
+      "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+      "files": [
+        "backend/project_editor/merge.py",
+        "backend/tests/test_merge.py"
+      ],
+      "blocked_by": [
+        "T2.1"
+      ],
+      "parallel_group": "isolated-modules",
+      "acceptance_test": "cd backend && uv run pytest -q tests/test_merge.py",
+      "sdd_snippet": "`merge.py` exports `merge_edit(base: EditableFields, proposed: EditableFields, current: EditableFields) -> MergeResult`."
+    },
+    {
+      "task_id": "T3.2",
+      "goal_id": "G3",
+      "title": "Implement upstream adapter",
+      "rationale": "Full replacement and ambiguous responses belong at one HTTP boundary.",
+      "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+      "files": [
+        "backend/project_editor/upstream.py",
+        "backend/tests/test_upstream.py"
+      ],
+      "blocked_by": [
+        "T2.1"
+      ],
+      "parallel_group": "isolated-modules",
+      "acceptance_test": "cd backend && uv run pytest -q tests/test_upstream.py",
+      "sdd_snippet": "It signals missing projects, unavailable reads, and uncertain writes distinctly."
+    },
+    {
+      "task_id": "T3.3",
+      "goal_id": "G3",
+      "title": "Implement frontend API client",
+      "rationale": "All browser requests need one relative /api boundary and Zod response parsing.",
+      "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+      "files": [
+        "frontend/src/api.ts"
+      ],
+      "blocked_by": [
+        "T2.2"
+      ],
+      "parallel_group": "isolated-modules",
+      "acceptance_test": "cd frontend && npm run build",
+      "sdd_snippet": "`api.ts` exports `listProjects()`, `getProject(id)`, and `saveProject(id, base, proposed)`; save returns a discriminated result for `saved`, `conflict`, or `uncertain`."
+    },
+    {
+      "task_id": "T3.4",
+      "goal_id": "G3",
+      "title": "Implement project list view",
+      "rationale": "Listing and selection can be built without editing form or app assembly files.",
+      "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+      "files": [
+        "frontend/src/ProjectList.tsx"
+      ],
+      "blocked_by": [
+        "T2.2"
+      ],
+      "parallel_group": "isolated-modules",
+      "acceptance_test": "cd frontend && npm run build",
+      "sdd_snippet": "`ProjectList.tsx` receives summaries, selected ID, loading state, and an `onSelect(id)` callback."
+    },
+    {
+      "task_id": "T3.5",
+      "goal_id": "G3",
+      "title": "Implement form and conflict views",
+      "rationale": "Date editing and per-field conflict choices are file-disjoint from the list and API client.",
+      "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+      "files": [
+        "frontend/src/ProjectForm.tsx",
+        "frontend/src/ConflictResolution.tsx"
+      ],
+      "blocked_by": [
+        "T2.2"
+      ],
+      "parallel_group": "isolated-modules",
+      "acceptance_test": "cd frontend && npm run build",
+      "sdd_snippet": "`ProjectForm.tsx` receives a draft, saving/disabled state, and `onChange(nextDraft)` and `onSave()` callbacks; it owns field and date-row controls but no network or project selection."
+    },
+    {
+      "task_id": "T4.1",
+      "goal_id": "G4",
+      "title": "Wire backend list, show, and save routes",
+      "rationale": "Routes combine validated input, merge decisions, and upstream I/O.",
+      "sdd_reference": "docs/sdd/architecture.md#backend-module-interfaces",
+      "files": [
+        "backend/project_editor/main.py",
+        "backend/tests/test_api.py"
+      ],
+      "blocked_by": [
+        "T3.1",
+        "T3.2"
+      ],
+      "parallel_group": "assemblies",
+      "acceptance_test": "cd backend && uv run pytest -q tests/test_api.py",
+      "sdd_snippet": "`main.py` alone maps those outcomes to the browser HTTP responses. No worker adds a fourth endpoint."
+    },
+    {
+      "task_id": "T4.2",
+      "goal_id": "G4",
+      "title": "Wire frontend screen and proxy",
+      "rationale": "Screen state combines isolated views and the API client against the backend path.",
+      "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/main.tsx",
+        "frontend/vite.config.ts"
+      ],
+      "blocked_by": [
+        "T3.3",
+        "T3.4",
+        "T3.5"
+      ],
+      "parallel_group": "assemblies",
+      "acceptance_test": "cd frontend && npm run build",
+      "sdd_snippet": "`App.tsx` owns selection, base/draft snapshots, conflict rebase, uncertainty, and API orchestration."
+    },
+    {
+      "task_id": "T5.1",
+      "goal_id": "G5",
+      "title": "Run live smoke and record limits",
+      "rationale": "A real upstream flow proves the main path and grounds concurrency claims.",
+      "sdd_reference": "docs/sdd/architecture.md#runtime-behavior-and-safety",
+      "files": [
+        "DECISIONS.md"
+      ],
+      "blocked_by": [
+        "T4.1",
+        "T4.2"
+      ],
+      "parallel_group": "handoff",
+      "acceptance_test": "With all three services running, assert list/show, two distinct edits, one 409 conflict, and Vite /api proxy.",
+      "sdd_snippet": "The three-way merge handles sequential stale editors. It cannot close the gap between its fresh read and upstream `PUT`."
+    },
+    {
+      "task_id": "T5.2",
+      "goal_id": "G5",
+      "title": "Write exact run instructions",
+      "rationale": "The interview needs a reproducible startup path from a clean shell.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+      "files": [
+        "README.md"
+      ],
+      "blocked_by": [
+        "T4.1",
+        "T4.2"
+      ],
+      "parallel_group": "handoff",
+      "acceptance_test": "Follow README commands from a clean checkout until the project list loads.",
+      "sdd_snippet": "| Handoff | Human setup instructions, tradeoffs, and AI trail |"
+    },
+    {
+      "task_id": "T5.3",
+      "goal_id": "G5",
+      "title": "Record AI trail and final gate",
+      "rationale": "The submission must state what AI produced, what was corrected, and what was actually verified.",
+      "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+      "files": [
+        "AI_TRAIL.md"
+      ],
+      "blocked_by": [
+        "T5.1",
+        "T5.2"
+      ],
+      "parallel_group": null,
+      "acceptance_test": "pre-commit run --all-files",
+      "sdd_snippet": "| Handoff | Human setup instructions, tradeoffs, and AI trail |"
+    }
+  ],
+  "topological_order": [
+    "T1.1",
+    "T1.2",
+    "T1.3",
+    "T1.4",
+    "T1.5",
+    "T2.1",
+    "T2.2",
+    "T3.1",
+    "T3.2",
+    "T3.3",
+    "T3.4",
+    "T3.5",
+    "T4.1",
+    "T4.2",
+    "T5.1",
+    "T5.2",
+    "T5.3"
+  ],
+  "validation_passed": true
+}

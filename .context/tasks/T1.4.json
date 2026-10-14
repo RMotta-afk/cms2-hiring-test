@@ -1,0 +1,23 @@
+{
+  "task_id": "T1.4",
+  "goal_id": "G1",
+  "title": "Validate the commit gate",
+  "status": "pending",
+  "blocked_by": [
+    "T1.2",
+    "T1.3"
+  ],
+  "dependents": [
+    "T2.1",
+    "T2.2"
+  ],
+  "parent_task": null,
+  "files": [
+    ".pre-commit-config.yaml"
+  ],
+  "parallel_group": null,
+  "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+  "rationale": "The common baseline should reject malformed or untyped work before feature branches diverge.",
+  "acceptance_test": "pre-commit validate-config .pre-commit-config.yaml",
+  "sdd_snippet": "| Commit gate | pre-commit, Ruff hook, local ty/test/build hooks | pre-commit |"
+}

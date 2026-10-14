@@ -1,0 +1,21 @@
+{
+  "task_id": "T3.3",
+  "goal_id": "G3",
+  "title": "Implement frontend API client",
+  "status": "pending",
+  "blocked_by": [
+    "T2.2"
+  ],
+  "dependents": [
+    "T4.2"
+  ],
+  "parent_task": null,
+  "files": [
+    "frontend/src/api.ts"
+  ],
+  "parallel_group": "isolated-modules",
+  "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+  "rationale": "All browser requests need one relative /api boundary and Zod response parsing.",
+  "acceptance_test": "cd frontend && npm run build",
+  "sdd_snippet": "`api.ts` exports `listProjects()`, `getProject(id)`, and `saveProject(id, base, proposed)`; save returns a discriminated result for `saved`, `conflict`, or `uncertain`."
+}

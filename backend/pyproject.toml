@@ -1,0 +1,44 @@
+[project]
+name = "project-editor-api"
+version = "0.1.0"
+description = "Small editing API in front of the upstream records service"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "httpx>=0.28",
+    "uvicorn>=0.30",
+]
+
+[project.scripts]
+project-editor = "project_editor.main:run"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff==0.16.10",
+    "ty>=0.0.18",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["project_editor"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ANN"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN"]
+
+[tool.ty.rules]
+missing-type-argument = "error"
+unsound-assignment = "error"
+unsound-return-statement = "error"

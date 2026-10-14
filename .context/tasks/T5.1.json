@@ -1,0 +1,22 @@
+{
+  "task_id": "T5.1",
+  "goal_id": "G5",
+  "title": "Run live smoke and record limits",
+  "status": "pending",
+  "blocked_by": [
+    "T4.1",
+    "T4.2"
+  ],
+  "dependents": [
+    "T5.3"
+  ],
+  "parent_task": null,
+  "files": [
+    "DECISIONS.md"
+  ],
+  "parallel_group": "handoff",
+  "sdd_reference": "docs/sdd/architecture.md#runtime-behavior-and-safety",
+  "rationale": "A real upstream flow proves the main path and grounds concurrency claims.",
+  "acceptance_test": "With all three services running, assert list/show, two distinct edits, one 409 conflict, and Vite /api proxy.",
+  "sdd_snippet": "The three-way merge handles sequential stale editors. It cannot close the gap between its fresh read and upstream `PUT`."
+}

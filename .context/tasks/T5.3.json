@@ -1,0 +1,20 @@
+{
+  "task_id": "T5.3",
+  "goal_id": "G5",
+  "title": "Record AI trail and final gate",
+  "status": "pending",
+  "blocked_by": [
+    "T5.1",
+    "T5.2"
+  ],
+  "dependents": [],
+  "parent_task": null,
+  "files": [
+    "AI_TRAIL.md"
+  ],
+  "parallel_group": null,
+  "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+  "rationale": "The submission must state what AI produced, what was corrected, and what was actually verified.",
+  "acceptance_test": "pre-commit run --all-files",
+  "sdd_snippet": "| Handoff | Human setup instructions, tradeoffs, and AI trail |"
+}

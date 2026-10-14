@@ -1,0 +1,24 @@
+{
+  "task_id": "T2.1",
+  "goal_id": "G2",
+  "title": "Implement backend Pydantic contracts",
+  "status": "pending",
+  "blocked_by": [
+    "T1.4",
+    "T1.5"
+  ],
+  "dependents": [
+    "T3.1",
+    "T3.2"
+  ],
+  "parent_task": null,
+  "files": [
+    "backend/project_editor/contracts.py",
+    "backend/tests/test_contracts.py"
+  ],
+  "parallel_group": "schemas",
+  "sdd_reference": "docs/sdd/architecture.md#allowed-components-and-files",
+  "rationale": "Server validation and projections must match the frozen browser API.",
+  "acceptance_test": "cd backend && uv run ty check project_editor/contracts.py tests/test_contracts.py",
+  "sdd_snippet": "| Backend models | Validate browser input and parse the wide upstream record; expose only small response models |"
+}

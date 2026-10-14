@@ -1,0 +1,23 @@
+{
+  "task_id": "T1.2",
+  "goal_id": "G1",
+  "title": "Lock backend dependencies",
+  "status": "pending",
+  "blocked_by": [
+    "T1.1"
+  ],
+  "dependents": [
+    "T1.4"
+  ],
+  "parent_task": null,
+  "files": [
+    "backend/pyproject.toml",
+    "backend/uv.lock",
+    "backend/project_editor/__init__.py"
+  ],
+  "parallel_group": "manifests",
+  "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+  "rationale": "Backend workers must share the same typed FastAPI toolchain.",
+  "acceptance_test": "cd backend && uv sync --locked",
+  "sdd_snippet": "| Backend | Python 3.11+, FastAPI/Pydantic, HTTPX, Uvicorn | uv, pytest, Ruff, ty |"
+}

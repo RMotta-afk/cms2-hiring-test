@@ -1,0 +1,21 @@
+{
+  "task_id": "T3.4",
+  "goal_id": "G3",
+  "title": "Implement project list view",
+  "status": "pending",
+  "blocked_by": [
+    "T2.2"
+  ],
+  "dependents": [
+    "T4.2"
+  ],
+  "parent_task": null,
+  "files": [
+    "frontend/src/ProjectList.tsx"
+  ],
+  "parallel_group": "isolated-modules",
+  "sdd_reference": "docs/sdd/architecture.md#frontend-component-interfaces",
+  "rationale": "Listing and selection can be built without editing form or app assembly files.",
+  "acceptance_test": "cd frontend && npm run build",
+  "sdd_snippet": "`ProjectList.tsx` receives summaries, selected ID, loading state, and an `onSelect(id)` callback."
+}

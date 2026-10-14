@@ -1,0 +1,23 @@
+{
+  "task_id": "T1.3",
+  "goal_id": "G1",
+  "title": "Lock frontend dependencies",
+  "status": "pending",
+  "blocked_by": [
+    "T1.1"
+  ],
+  "dependents": [
+    "T1.4",
+    "T1.5"
+  ],
+  "parent_task": null,
+  "files": [
+    "frontend/package.json",
+    "frontend/package-lock.json"
+  ],
+  "parallel_group": "manifests",
+  "sdd_reference": "docs/sdd/architecture.md#allowed-dependencies",
+  "rationale": "Frontend workers need a reproducible React, MUI, and Zod toolchain.",
+  "acceptance_test": "cd frontend && npm ci",
+  "sdd_snippet": "| Frontend | React, MUI, Zod | TypeScript, Vite, npm |"
+}
